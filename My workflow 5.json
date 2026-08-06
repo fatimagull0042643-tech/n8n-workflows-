@@ -1,0 +1,371 @@
+{
+  "name": "My workflow 5",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {}
+      },
+      "id": "19258831-9372-4564-bdf6-e79719991c10",
+      "name": "WhatsApp Trigger",
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        112
+      ],
+      "webhookId": "b072e686-a420-48a2-a513-928ea9d7d009",
+      "credentials": {
+        "whatsAppTriggerApi": {
+          "id": "zBpobkymrnNoKSz7",
+          "name": "WhatsApp OAuth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.messages[0].text.body }}",
+        "options": {
+          "systemMessage": ""
+        }
+      },
+      "id": "217e5692-d53e-46ec-8250-339a5a9aa91a",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        416,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "model": "magistral-small-latest",
+        "options": {}
+      },
+      "id": "1fad9aa4-093b-4b7e-931d-a277352b0484",
+      "name": "Mistral Cloud Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "typeVersion": 1,
+      "position": [
+        224,
+        336
+      ],
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "FWerQplt2qw0jBQV",
+          "name": "Mistral Cloud account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}"
+      },
+      "id": "545fc79f-fadc-4ef9-9a6a-36c9ac892f1e",
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        352,
+        336
+      ]
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Append a new confirmed food order as a row to the Orders sheet. Provide Customer Name, Food Item (exactly as it appears in the inventory), Quantity Ordered, and Status (\"Pending\"). Order Date is filled automatically.",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1-Df_gNL4nNIjjMZD_Yp6tNzDQbcalLuUfG2BGSdyxCc",
+          "mode": "list",
+          "cachedResultName": "hotel database",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-Df_gNL4nNIjjMZD_Yp6tNzDQbcalLuUfG2BGSdyxCc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1004856209,
+          "mode": "list",
+          "cachedResultName": "order ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-Df_gNL4nNIjjMZD_Yp6tNzDQbcalLuUfG2BGSdyxCc/edit#gid=1004856209"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Customer Name ": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Customer_Name_', ``, 'string') }}",
+            "Food Item ": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Food_Item_', ``, 'string') }}",
+            "Quantity Ordered": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Quantity_Ordered', ``, 'string') }}",
+            "Order Date ": "={{ $now }}",
+            "Status ": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Status_', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Customer Name ",
+              "displayName": "Customer Name ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Food Item ",
+              "displayName": "Food Item ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Quantity Ordered",
+              "displayName": "Quantity Ordered",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Order Date ",
+              "displayName": "Order Date ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status ",
+              "displayName": "Status ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "0417e4ee-dcc1-4183-b2a5-93faabab4ea4",
+      "name": "post_orders",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        480,
+        336
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "F2Bt9mUceDm0ATHW",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Read all rows from the FAQs sheet. Use this to answer general customer questions (opening hours, delivery, refund policy, vegetarian options, ordering methods, payment methods). Returns all FAQ entries; no input needed.",
+        "documentId": {
+          "__rl": true,
+          "value": "1-Df_gNL4nNIjjMZD_Yp6tNzDQbcalLuUfG2BGSdyxCc",
+          "mode": "list",
+          "cachedResultName": "hotel database",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-Df_gNL4nNIjjMZD_Yp6tNzDQbcalLuUfG2BGSdyxCc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1953299044,
+          "mode": "list",
+          "cachedResultName": "query ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-Df_gNL4nNIjjMZD_Yp6tNzDQbcalLuUfG2BGSdyxCc/edit#gid=1953299044"
+        },
+        "options": {}
+      },
+      "id": "123e7610-93ad-49b0-9323-ce3323bfa32c",
+      "name": "get_faqs",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        608,
+        336
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "F2Bt9mUceDm0ATHW",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Read all rows from the Inventory/menu sheet. Each row has the Food Item name, available Quantity, and Status (e.g. \"In stock\" / \"Out of stock\"). Use this to check availability and stock before confirming an order. Returns all items; no input needed.",
+        "documentId": {
+          "__rl": true,
+          "value": "1-Df_gNL4nNIjjMZD_Yp6tNzDQbcalLuUfG2BGSdyxCc",
+          "mode": "list",
+          "cachedResultName": "hotel database",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-Df_gNL4nNIjjMZD_Yp6tNzDQbcalLuUfG2BGSdyxCc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "menu",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-Df_gNL4nNIjjMZD_Yp6tNzDQbcalLuUfG2BGSdyxCc/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Status ",
+              "lookupValue": "available"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0d6321f0-f5e5-4e9c-970d-43859592461c",
+      "name": "get_inventory",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        736,
+        336
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "F2Bt9mUceDm0ATHW",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "1154821507724813",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "textBody": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "id": "c84b4018-acbb-4ce0-8886-a54596df0a34",
+      "name": "Send message",
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        944,
+        112
+      ],
+      "webhookId": "bc12bcd6-d00e-485e-843e-da4d12b9fa0c",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "ObQjXCw8zmTHWu0z",
+          "name": "WhatsApp account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "WhatsApp Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mistral Cloud Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "post_orders": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_faqs": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_inventory": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "149a5cdf-a186-4d7e-a4fa-8edb9ab0e3ae",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fe8f0072fc1c5fc13651f88188ab6c67cdab986ea7ffcfdbe10ee2d1d232eb03"
+  },
+  "nodeGroups": [],
+  "id": "NFtZ8HnH2SXDE22w",
+  "tags": []
+}
