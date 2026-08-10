@@ -1,0 +1,97 @@
+{
+  "name": "Contact Form → Email Notification",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Contact Us",
+        "formDescription": "Fill out this form and we'll get back to you.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Name",
+              "fieldName": "name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Email",
+              "fieldType": "email",
+              "fieldName": "email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Message",
+              "fieldType": "textarea",
+              "fieldName": "message",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "01efc31e-eab3-49e1-b488-690963944d4c",
+      "name": "Contact Form Submitted",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "bac97bb2-ee5d-402c-9077-cc6ec069e385"
+    },
+    {
+      "parameters": {
+        "sendTo": "<__PLACEHOLDER_VALUE__Your notification email address (e.g. you@example.com)__>",
+        "subject": "=New contact form submission from {{ $json.name }}",
+        "emailType": "text",
+        "message": "=Name: {{ $json.name }}\nEmail: {{ $json.email }}\nMessage: {{ $json.message }}",
+        "options": {}
+      },
+      "id": "3584fc2f-0418-48f2-9cad-bcdccc822d5a",
+      "name": "Send Notification Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        224,
+        0
+      ],
+      "webhookId": "bd4c4c1e-52d0-4b50-bd73-eba0840ba50e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "yVyhXbBTECLdJVUx",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Contact Form Submitted": {
+      "main": [
+        [
+          {
+            "node": "Send Notification Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
+  },
+  "versionId": "a701e4f7-14a4-4dd9-9993-5bc4ae05c3cc",
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp",
+    "instanceId": "dad100b602147f456e90ebe5b11004859c154b227b3cbad734925a4855ab60d7"
+  },
+  "nodeGroups": [],
+  "id": "IvBhFpujPs5Lfgah",
+  "tags": []
+}
