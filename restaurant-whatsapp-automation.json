@@ -1,0 +1,191 @@
+{
+  "name": "Restaurant WhatsApp Automation",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "wa-trigger-01",
+      "name": "WhatsApp Trigger",
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        0
+      ],
+      "webhookId": "restaurant-whatsapp-webhook",
+      "credentials": {
+        "whatsAppTriggerApi": {
+          "id": "REPLACE_WITH_CREDENTIAL_ID",
+          "name": "WhatsApp Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "text",
+        "operation": "complete",
+        "prompt": "={{ $json.messages[0].text.body }}",
+        "options": {
+          "systemMessage": "You are the WhatsApp assistant for 'The Golden Spoon' restaurant.\n\nRestaurant info:\n- Hours: Tue-Sun, 12:00-22:00 (closed Mondays)\n- Menu: Starters (Bruschetta $6, Soup of the Day $5), Mains (Grilled Salmon $18, Margherita Pizza $14, Chicken Alfredo $16), Desserts (Tiramisu $7)\n- Delivery available within 5km, or dine-in/pickup\n- Reservations: ask for name, party size, date, and time\n- Orders: ask for items, quantities, delivery or pickup, and address if delivery\n\nBe warm, concise, and use natural WhatsApp-style messages (short paragraphs, no markdown). If the customer wants to place an order or book a table, collect all needed details and end your reply with a line starting exactly with 'ORDER_SUMMARY:' or 'RESERVATION_SUMMARY:' followed by a compact JSON object of the details, ONLY once you have all required info. Otherwise just answer their question normally without that line."
+        }
+      },
+      "id": "openai-reply-01",
+      "name": "Generate Reply (OpenAI)",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1.1,
+      "position": [
+        -160,
+        0
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "REPLACE_WITH_CREDENTIAL_ID",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "phoneNumberId": "REPLACE_WITH_PHONE_NUMBER_ID",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "textBody": "={{ $json.message.content.split('ORDER_SUMMARY:')[0].split('RESERVATION_SUMMARY:')[0].trim() }}"
+      },
+      "id": "wa-send-01",
+      "name": "Send WhatsApp Reply",
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        100,
+        0
+      ],
+      "credentials": {
+        "whatsAppApi": {
+          "id": "REPLACE_WITH_CREDENTIAL_ID",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "cond-order",
+              "leftValue": "={{ $json.message.content }}",
+              "rightValue": "SUMMARY:",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-summary-01",
+      "name": "Order or Reservation?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        100,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "sheet",
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "REPLACE_WITH_GOOGLE_SHEET_ID"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "Orders"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $now.toISO() }}",
+            "CustomerPhone": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+            "RawSummary": "={{ $json.message.content }}"
+          },
+          "matchingColumns": [
+            "CustomerPhone"
+          ]
+        },
+        "options": {}
+      },
+      "id": "sheets-log-01",
+      "name": "Log Order to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        340,
+        200
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_CREDENTIAL_ID",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "WhatsApp Trigger": {
+      "main": [
+        [
+          {
+            "node": "Generate Reply (OpenAI)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Reply (OpenAI)": {
+      "main": [
+        [
+          {
+            "node": "Send WhatsApp Reply",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Order or Reservation?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Order or Reservation?": {
+      "main": [
+        [
+          {
+            "node": "Log Order to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "description": "WhatsApp automation for a restaurant. Answers menu/hours/reservation questions via AI, replies on WhatsApp, and logs orders/reservations to Google Sheets. Replace all REPLACE_WITH_* placeholders with your own credentials/IDs before importing into n8n."
+  }
+}
