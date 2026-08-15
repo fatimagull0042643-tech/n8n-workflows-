@@ -1,0 +1,122 @@
+{
+  "name": "Coding Practice Coach",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {
+          "responseMode": "streaming"
+        }
+      },
+      "id": "8b998663-8e9c-488e-8b0d-50e3572f0fd5",
+      "name": "Chat Trigger",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        112
+      ],
+      "webhookId": "07f58211-2958-4a93-a7e1-83a09f4bf84d"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "You are a friendly, encouraging coding practice coach. Your job is to help the user improve their coding skills through deliberate practice.\n\nHow you operate:\n1. If the user has not specified a language, topic, or difficulty, ask a brief clarifying question (language, topic/data-structure, and difficulty: easy/medium/hard).\n2. When asked for a problem, give ONE clear, well-scoped coding problem appropriate to the requested difficulty, including a short example input/output. Do not give the solution yet.\n3. When the user submits code or asks for help, do NOT just hand them the full solution immediately. First give a hint that nudges them toward the fix or approach. Only give a full solution if they explicitly ask for it or have already tried and are still stuck after a hint.\n4. When reviewing code, point out correctness issues, edge cases, time/space complexity, and style, in a constructive tone.\n5. After they solve a problem, briefly congratulate them, note what they did well, and offer to give a harder or related problem next.\n6. Keep responses focused and not overly long. Use code blocks for code.\n7. Track the conversation so you can reference earlier problems and adjust difficulty over time."
+        }
+      },
+      "id": "0a8227b6-4292-43ec-8893-1677406fe499",
+      "name": "Coding Practice Coach",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        224,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 20
+      },
+      "id": "ed9af362-63b3-4dbe-a661-ffdb5278be3a",
+      "name": "Session Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        368,
+        336
+      ]
+    },
+    {
+      "parameters": {
+        "model": "mistral-large-latest",
+        "options": {}
+      },
+      "id": "b2dbce39-318e-49ba-946a-1f4f9fde84aa",
+      "name": "Mistral Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "typeVersion": 1,
+      "position": [
+        224,
+        384
+      ],
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "2quy1CMh30ajH0ft",
+          "name": "Mistral Cloud account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Chat Trigger": {
+      "main": [
+        [
+          {
+            "node": "Coding Practice Coach",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Session Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Coding Practice Coach",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mistral Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Coding Practice Coach",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
+  },
+  "versionId": "7805515a-4db1-4fcb-acd3-315d211bd8d1",
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp",
+    "instanceId": "dad100b602147f456e90ebe5b11004859c154b227b3cbad734925a4855ab60d7"
+  },
+  "nodeGroups": [],
+  "id": "Qj2lHNi4O4f0Cmws",
+  "tags": []
+}
